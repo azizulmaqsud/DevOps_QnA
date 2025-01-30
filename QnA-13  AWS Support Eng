@@ -1,0 +1,118 @@
+Real-time Interview Crackers!  Part # 13
+(AWS Support Engineer – Troubleshooting)
+Deep Dive into Real-time Support Engineers’ Issues in AWS (Total 12 QnA)
+Questionnaire 
+Q1: How do AWS Support Engineers troubleshoot Lambda issues?
+Q2: What are common RDS troubleshooting tasks?
+Q3: How do you troubleshoot S3 access or performance issues?
+Q4: What are typical EC2 troubleshooting steps?
+Q5: How does X-Ray help in debugging applications?
+Q6: What are common Secrets Manager issues?
+Q7: How do engineers resolve Route 53 DNS issues?
+Q8: What tools are used for proactive monitoring?
+Q9: How do you leverage CloudTrail for security investigations?
+Q10: What are key use cases for AWS Config?
+Q11: How does Trusted Advisor improve operations?
+Q12: How do Support Engineers handle CloudWatch Alarms?
+
+
+In detail
+Real-World Troubleshooting Scenarios
+Q1: How do AWS Support Engineers troubleshoot Lambda issues?
+Answer:
+•	Use CloudWatch Logs for detailed execution analysis.
+•	Check memory or timeout configurations and ensure IAM permissions are correct.
+Real-World Scenario: A customer's Lambda function fails intermittently when fetching data from an S3 bucket. Troubleshooting Steps:
+1.	Review CloudWatch Logs to identify error codes like AccessDenied.
+2.	Confirm the Lambda execution role has the s3:GetObject permission.
+3.	Verify the bucket policy allows access from the Lambda function’s ARN.
+4.	Suggest enabling retries or increasing the function's timeout.
+________________________________________
+Q2: What are common RDS troubleshooting tasks?
+Answer:
+Handle connectivity issues, optimize query performance, and resolve backup failures.
+Real-World Scenario: A customer’s RDS instance is unresponsive due to high CPU utilization. Troubleshooting Steps:
+1.	Enable Performance Insights to identify high-load queries.
+2.	Suggest adding proper indexing or optimizing queries.
+3.	Scale the instance to a higher class if resource usage remains high.
+________________________________________
+Q3: How do you troubleshoot S3 access or performance issues?
+Answer:
+•	Check IAM permissions, bucket policies, and encryption settings.
+Real-World Scenario: A customer reports slow performance when listing objects in an S3 bucket with millions of files. Troubleshooting Steps:
+1.	Review S3 Access Logs and confirm API request patterns.
+2.	Recommend using S3 Object Prefixes to improve parallelism.
+3.	Suggest using S3 Inventory or Amazon S3 Select for faster data access.
+________________________________________
+Q4: What are typical EC2 troubleshooting steps?
+Answer:
+•	Diagnose issues using CloudWatch Metrics, system logs, and networking tools.
+Real-World Scenario: An EC2 instance cannot connect to the internet after a recent VPC migration. Troubleshooting Steps:
+1.	Check the route table for proper association with the internet gateway.
+2.	Ensure the security group allows outbound traffic on required ports.
+3.	Verify that the instance has a public IP assigned or configure a NAT gateway.
+________________________________________
+Q5: How does X-Ray help in debugging applications?
+Answer:
+•	Pinpoint bottlenecks in distributed systems with traces and service maps.
+Real-World Scenario: A customer reports that their API Gateway + Lambda architecture is experiencing high latency. Troubleshooting Steps:
+1.	Enable X-Ray on API Gateway and Lambda to trace request flow.
+2.	Identify a slow database query causing delays.
+3.	Recommend caching the query results using DynamoDB Accelerator (DAX) or ElastiCache.
+________________________________________
+Q6: What are common Secrets Manager issues?
+Answer:
+•	Address access denials, secret rotation failures, or retrieval problems.
+Real-World Scenario: A secret rotation fails after a recent update to the associated database password. Troubleshooting Steps:
+1.	Review the Lambda function logs responsible for secret rotation.
+2.	Verify that the new password matches the database's credentials.
+3.	Ensure the Lambda function’s role has the necessary permissions to update the secret.
+________________________________________
+Q7: How do engineers resolve Route 53 DNS issues?
+Answer:
+•	Validate hosted zones, routing policies, and health checks.
+Real-World Scenario: A customer’s website is unreachable after migrating DNS to Route 53. Troubleshooting Steps:
+1.	Confirm that the NS records in the registrar’s settings point to Route 53.
+2.	Check the hosted zone’s records (A/AAAA) for correctness.
+3.	Test DNS resolution using dig or nslookup to ensure propagation.
+________________________________________
+Q8: What tools are used for proactive monitoring?
+Answer:
+•	CloudWatch, AWS Config, and Trusted Advisor.
+Real-World Scenario: A customer wants to proactively monitor RDS storage utilization. Troubleshooting Steps:
+1.	Set up a CloudWatch Alarm to trigger when storage usage exceeds 80%.
+2.	Recommend enabling automatic storage scaling for the RDS instance.
+________________________________________
+Q9: How do you leverage CloudTrail for security investigations?
+Answer:
+•	Analyze API call history to track unauthorized actions.
+Real-World Scenario: A customer suspects unauthorized access to an S3 bucket. Troubleshooting Steps:
+1.	Review CloudTrail logs for PutBucketPolicy or GetObject events.
+2.	Identify the IAM user or role making the suspicious calls.
+3.	Suggest implementing bucket policies and MFA for additional security.
+________________________________________
+Q10: What are key use cases for AWS Config?
+Answer:
+•	Compliance checks, resource inventory, and drift detection.
+Real World Scenario: A customer wants to enforce encryption on all EBS volumes. Troubleshooting Steps:
+1.	Enable an AWS Config Rule to check if encryption is enabled.
+2.	Flag non-compliant resources and suggest enabling default encryption for EBS.
+________________________________________
+Q11: How does Trusted Advisor improve operations?
+Answer:
+•	Optimize costs, security, fault tolerance, and performance.
+Real-World Scenario: A customer receives alerts about overly permissive IAM roles. Troubleshooting Steps:
+1.	Use Trusted Advisor to identify roles with * permissions.
+2.	Suggest implementing least privilege policies.
+________________________________________
+Q12: How do Support Engineers handle CloudWatch Alarms?
+Answer:
+•	Monitor and respond to performance thresholds or errors.
+Real-World Scenario: A customer’s EC2 instance is terminating repeatedly due to high CPU usage. Troubleshooting Steps:
+1.	Review CloudWatch Alarms for CPU thresholds.
+2.	Check application logs for processes causing spikes.
+3.	Scale the instance or distribute workloads across multiple instances.
+________________________________________
+Conclusion
+Here we covered critical areas like Lambda, EC2, S3, RDS, Secrets Manager, and monitoring tools like CloudWatch and AWS Config, it provides a comprehensive view of an AWS Support Engineer’s role.
+
