@@ -1,0 +1,234 @@
+Real-time Interview Crackers!  Part # 4
+Kubernetes Deployment 
+Real-Time Debugging Scenarios, How to Address Them
+
+Questionnaire
+Q1: What are the three main components you create when deploying an application to Kubernetes?
+Q2: What are the roles of internal and external load balancers in Kubernetes?
+Q3: How are pods managed in Kubernetes?
+Q4: How should ports and labels be configured to ensure proper communication between components?
+Q5: What are the best practices for using labels in Kubernetes?
+Q6: How can you test whether your Deployment and Service are correctly configured?
+Q7: How do you troubleshoot pods that are not running or ready?
+Q8: What does the error "ImagePullBackOff" mean, and how do you resolve it?
+Q9: What does the "CrashLoopBackOff" error indicate, and how do you debug it?
+Q10: How do you test and debug an Ingress configuration?
+Q11: What are the common issues when Ingress fails to route traffic correctly?
+
+In Detail
+Q1: What are the three main components you create when deploying an application to Kubernetes?
+A:
+1.	Deployment: A blueprint describing how to run your application, including the number of replicas.
+2.	Service: An internal load balancer that routes traffic to your pods.
+3.	Ingress: Describes how to route external traffic to your service from outside the cluster.
+________________________________________
+Q2: What are the roles of internal and external load balancers in Kubernetes?
+A:
+•	Internal Load Balancer (Service): Routes traffic to pods within the cluster.
+•	External Load Balancer (Ingress): Routes traffic from outside the cluster to services.
+________________________________________
+Q3: How are pods managed in Kubernetes?
+A: Pods are not deployed directly. Instead, they are managed through higher-level abstractions like Deployments, which control how pods are created and maintained.
+________________________________________
+Q4: How should ports and labels be configured to ensure proper communication between components?
+A:
+1.	Service Selector: Must match at least one pod label to route traffic.
+2.	Service Target Port: Must match the container port in the pod.
+3.	Service Port: Can be any unique number since services have different IP addresses.
+4.	Ingress Service Name: Must match the service name.
+5.	Ingress Service Port: Must match the service's exposed port.
+________________________________________
+Q5: What are the best practices for using labels in Kubernetes?
+A:
+•	Use consistent labels across resources to simplify selectors and filtering.
+•	For advanced cases like blue-green deployments, additional labels (e.g., app version) can be used to differentiate pods.
+•	Ensure the matchLabels in Deployment match pod labels for proper tracking.
+________________________________________
+Q6: How can you test whether your Deployment and Service are correctly configured?
+A:
+1.	Use kubectl get endpoints to verify if the service points to the correct pods.
+2.	Use kubectl port-forward to test service connectivity.
+Example: kubectl port-forward svc/my-service 3000:7070
+3.	Inspect service and pod labels to confirm they match.
+4.	Use curl or a browser to access the forwarded port.
+________________________________________
+Q7: How do you troubleshoot pods that are not running or ready?
+A: Use the following commands:
+•	kubectl logs <pod-name>: Retrieve container logs for error details.
+•	kubectl describe pod <pod-name>: View events and pod status.
+•	kubectl get pod -o yaml: Extract the pod’s YAML definition.
+•	kubectl exec -it <pod-name> -- bash: Access the pod for further investigation.
+________________________________________
+Q8: What does the error "ImagePullBackOff" mean, and how do you resolve it?
+A: This error occurs when Kubernetes cannot pull the container image.
+Common reasons:
+1.	Invalid image name or tag.
+2.	Nonexistent tag.
+3.	Private image without access.
+Resolutions:
+•	Correct the image name or tag.
+•	Add credentials as a Kubernetes secret for private images.
+________________________________________
+Q9: What does the "CrashLoopBackOff" error indicate, and how do you debug it?
+A: This error indicates that the container repeatedly fails to start.
+Possible causes:
+1.	Application errors preventing startup.
+2.	Missing dependencies.
+3.	Misconfigured environment variables.
+Debugging steps:
+•	Check logs with kubectl logs <pod-name>.
+•	Describe the pod with kubectl describe pod <pod-name>.
+•	Validate the container's configuration.
+________________________________________
+Q10: How do you test and debug an Ingress configuration?
+A:
+1.	Use kubectl port-forward to connect to the Ingress controller.
+2.	Verify the Ingress routing by inspecting endpoints.
+3.	Add headers to simulate domain-based routing.
+4.	For Minikube, use minikube tunnel to create a load balancer and resolve domains manually.
+________________________________________
+Q11: What are the common issues when Ingress fails to route traffic correctly?
+A:
+1.	Service Name Mismatch: Ensure serviceName in Ingress matches the actual service name.
+2.	Port Mismatch: Ensure the service.port in Ingress matches the service’s exposed port.
+3.	Named Ports: Ingress does not support named ports—use numeric port values instead.
+
+
+Real-time Interview Crackers!  Part # 5
+Real-Time Debugging Scenarios, How To Address Them
+1. Deployment and Service: Linking Issues
+2. Ingress Configuration Issues
+3. Pod Startup Failures
+4. ImagePullBackOff Error
+5. Debugging Ingress Access
+
+In Detail:
+1. Deployment and Service: Linking Issues
+Problem:
+You created a deployment and a service, but the service isn't routing traffic to your pods.
+Debugging Steps:
+1.	Check Pod Readiness: Use kubectl get pods and ensure pods are in a Running state. If not:
+o	Run kubectl describe pod <pod-name> to inspect events.
+o	Check logs using kubectl logs <pod-name> for application-specific errors.
+2.	Verify Service Selector and Pod Labels: Ensure the service selector matches the pod labels:
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-app  # This should match pod labels
+Use:
+kubectl get pods --show-labels
+3.	Check Endpoints: Run kubectl get endpoints <service-name>. If it's empty:
+o	Ensure pods match the selector.
+o	Fix any typos in labels or selectors.
+Real-Time Issue:
+Service is not accessible despite the pods being in Running state.
+Root Cause: The targetPort in the service doesn't match the containerPort in the pod.
+Solution:
+Update the YAML:
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080  # Match this with the pod's containerPort
+________________________________________
+2. Ingress Configuration Issues
+Problem:
+Your ingress is not routing traffic to the service.
+Debugging Steps:
+1.	Check Ingress Logs:
+o	Access the ingress controller logs:
+kubectl logs -n ingress-nginx <controller-pod-name>
+2.	Verify Service Name and Port in Ingress: Ensure the serviceName and servicePort in the ingress match the service configuration.
+3.	Test Connection to the Service: Use port-forwarding:
+kubectl port-forward service/my-service 7070:8080
+curl http://localhost:7070
+If this works, the issue lies with the ingress configuration.
+4.	Inspect NGINX Configuration: Retrieve the NGINX configuration to see how ingress routes traffic:
+kubectl exec -it <nginx-controller-pod> -- cat /etc/nginx/nginx.conf
+Real-Time Issue:
+You are using a named port in the service, but ingress fails to route traffic.
+Root Cause: Ingress doesn't support named ports.
+Solution:
+Replace the named port in the service with a numeric value:
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+________________________________________
+3. Pod Startup Failures
+Problem:
+Pods are stuck in CrashLoopBackOff.
+Debugging Steps:
+1.	Inspect Pod Logs:
+kubectl logs <pod-name>
+2.	Describe the Pod: Look for event messages.
+kubectl describe pod <pod-name>
+3.	Common Real-Time Scenarios:
+o	Invalid Image:
+Run kubectl describe pod <pod-name> to see if there’s an ImagePullBackOff error.
+Solution: Ensure the image name and tag are correct, and credentials for private registries are configured.
+o	Port Binding Error:
+Logs show the application failed to bind to the specified port.
+Solution: Update the pod configuration to match the port exposed by the service.
+Real-Time Issue:
+Application logs indicate Address already in use.
+Root Cause: Multiple processes are trying to bind to the same port.
+Solution:
+Modify the application or deployment YAML to avoid port conflicts:
+containers:
+- name: app
+  ports:
+  - containerPort: 8080
+________________________________________
+4. ImagePullBackOff Error
+Problem:
+Pod cannot pull the specified image.
+Debugging Steps:
+1.	Check Image Name and Tag:
+spec:
+  containers:
+  - image: myrepo/myapp:latest  # Ensure this is correct
+2.	Verify Image Repository Access: If the image is private:
+o	Create a Kubernetes secret:
+kubectl create secret docker-registry regcred --docker-server=<registry> \
+  --docker-username=<username> --docker-password=<password> --docker-email=<email>
+o	Add the secret to the pod's spec:
+spec:
+  imagePullSecrets:
+  - name: regcred
+Real-Time Issue:
+ECR image pull fails in a different AWS account.
+Root Cause: EKS lacks permissions to access the image.
+Solution:
+Grant the necessary permissions to EKS using an IAM role.
+________________________________________
+5. Debugging Ingress Access
+Problem:
+Ingress is not accessible through the browser.
+Debugging Steps:
+1.	Verify External IP:
+kubectl get ingress
+2.	Check DNS Resolution: Ensure the DNS is pointing to the ingress IP.
+3.	Inspect SSL Certificates: If HTTPS is used, check if the certificate is valid:
+kubectl describe ingress <ingress-name>
+4.	Simulate Requests: Use curl with headers to test ingress routing:
+curl -H "Host: api.example.com" http://<ingress-ip>
+Real-Time Issue:
+Ingress returns a 404 error.
+Root Cause: The host in the ingress doesn’t match the request’s Host header.
+Solution:
+Update the ingress YAML to include the correct host:
+spec:
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: my-service
+            port:
+              number: 80
+
