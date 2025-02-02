@@ -1,7 +1,7 @@
 Real-time Interview Crackers!  Part # 14:1
 (AWS QnA for the Freshers + Experienced)
 AWS Engineers’ Day-2-day issues in the Real-time 
-(Total 22 QnA)
+(Total 20 QnA)
 Questionnaire 
 Q1: Briefly explain your roles and responsibilities in your previous organization.
 Q2: Which infrastructure provisioning tool do you prefer between AWS CloudFormation and Terraform? Why?
@@ -15,16 +15,14 @@ Q9: How did you troubleshoot a real-time issue with an unresponsive website host
 Q10. Can you describe a challenging AWS project and how you resolved critical issues?
 Q11. How do you ensure zero downtime during application deployment?
 Q12. How do you manage sensitive secrets for applications deployed in AWS environments like EKS?
-Q13. How do you troubleshoot an unresponsive website hosted on an EC2 instance?
-Q14. What are your strategies for optimizing AWS costs?
-Q15. How do you ensure security in your CI/CD pipelines?
-Q16. How do you deploy infrastructure with Terraform for an AWS project?
-Q17. Can you explain a real-time scenario where Auto Scaling prevented a major outage?
-Q18. How do you monitor and log applications deployed on AWS?
-Q19. How do you handle database migrations with zero downtime in AWS?
-Q20. How do you secure a multi-tier application hosted on AWS?
-Q21. Can you explain a disaster recovery strategy you've implemented on AWS?
-Q22. How do you handle high availability in an EKS-based application?
+Q13. How do you ensure security in your CI/CD pipelines?
+Q14. How do you deploy infrastructure with Terraform for an AWS project?
+Q15. Can you explain a real-time scenario where Auto Scaling prevented a major outage?
+Q16. How do you monitor and log applications deployed on AWS?
+Q17. How do you handle database migrations with zero downtime in AWS?
+Q18. How do you secure a multi-tier application hosted on AWS?
+Q19. Can you explain a disaster recovery strategy you've implemented on AWS?
+Q20. How do you handle high availability in an EKS-based application?
 
 In Detail
 Q1: Briefly explain your roles and responsibilities in your previous organization.
@@ -152,25 +150,7 @@ o	Mount secrets as environment variables or files inside pods.
 o	Use fine-grained permissions to access secrets securely without embedding credentials in code.
 4.	Encryption:
 o	Enable encryption at rest and in transit for all sensitive data.
-Q13. How do you troubleshoot an unresponsive website hosted on an EC2 instance?
-Answer:
-1.	Check EC2 instance health status: Verify from the AWS console or CLI.
-2.	System Logs: Analyze logs for errors (/var/log/messages or /var/log/nginx/error.log).
-3.	Performance Metrics: Use CloudWatch to check CPU, memory, and disk usage.
-4.	Security Groups and Network ACLs: Ensure inbound/outbound rules are configured correctly.
-5.	Elastic IP and DNS: Verify if the public IP or DNS records are correct.
-6.	HTTPD or NGINX Service: Check and restart the web server if necessary (sudo systemctl restart nginx).
-7.	OS-Level Firewalls: Ensure iptables or firewalld isn’t blocking traffic.
-________________________________________
-Q14. What are your strategies for optimizing AWS costs?
-Answer:
-1.	Instance Right-Sizing: Migrated workloads to Spot Instances for non-critical applications and Reserved Instances for stable workloads.
-2.	S3 Storage Optimization: Implemented lifecycle policies to transition infrequently accessed data to S3 Glacier.
-3.	Auto Scaling: Set up dynamic scaling policies to match demand.
-4.	CloudWatch Logs: Set up log expiration policies to minimize log retention costs.
-5.	Savings Plans: Recommended compute savings plans for consistent workloads.
-________________________________________
-Q15. How do you ensure security in your CI/CD pipelines?
+Q13. How do you ensure security in your CI/CD pipelines?
 Answer:
 1.	IAM Best Practices: Grant least privilege permissions to all resources.
 2.	Secrets Management: Use AWS Secrets Manager or environment variables securely in CI/CD pipelines.
@@ -178,7 +158,7 @@ Answer:
 4.	Artifact Security: Sign artifacts and enforce image scanning in Docker registries.
 5.	Pipeline Security: Use Amazon CodePipeline with encrypted artifacts.
 ________________________________________
-Q16. How do you deploy infrastructure with Terraform for an AWS project?
+Q14. How do you deploy infrastructure with Terraform for an AWS project?
 Answer:
 1.	Define the infrastructure as code using Terraform configuration files.
 2.	Initialize the directory with terraform init.
@@ -187,14 +167,14 @@ Answer:
 5.	Apply the configuration with terraform apply.
 6.	Manage state securely by storing it in S3 with state locking using DynamoDB.
 ________________________________________
-Q17. Can you explain a real-time scenario where Auto Scaling prevented a major outage?
+Q15. Can you explain a real-time scenario where Auto Scaling prevented a major outage?
 Answer:
 In a Black Friday sale, the application traffic suddenly spiked by 300%.
 Solution:
 •	Auto Scaling triggered the launch of additional instances based on defined CPU utilization thresholds.
 •	This scaling prevented service outages, and I monitored scaling activities using CloudWatch and EC2 dashboards.
 ________________________________________
-Q18. How do you monitor and log applications deployed on AWS?
+Q16. How do you monitor and log applications deployed on AWS?
 Answer:
 I implement comprehensive monitoring and logging practices:
 1.	CloudWatch: Monitor performance metrics and set up alarms.
@@ -203,13 +183,13 @@ I implement comprehensive monitoring and logging practices:
 4.	Elastic Load Balancer Access Logs: Monitor HTTP requests for ALBs.
 5.	Centralized Logging: Set up Fluentd or CloudWatch Logs Agent for aggregating logs.
 ________________________________________
-Q19. How do you handle database migrations with zero downtime in AWS?
+Q17. How do you handle database migrations with zero downtime in AWS?
 Answer:
 1.	AWS DMS (Database Migration Service): Migrate data with minimal downtime.
 2.	Blue-Green Deployment for Databases: Keep two databases in sync and switch over after validation.
 3.	Read Replicas: Promote read replicas as standalone instances if required.
 ________________________________________
-Q20. How do you secure a multi-tier application hosted on AWS?
+Q18. How do you secure a multi-tier application hosted on AWS?
 Answer:
 1.	VPC Design: Use public and private subnets to isolate layers.
 2.	Security Groups: Allow only necessary traffic between tiers.
@@ -217,7 +197,7 @@ Answer:
 4.	Encryption: Encrypt data in transit (TLS) and at rest (KMS).
 5.	IAM Policies: Enforce least privilege access for resources.
 ________________________________________
-Q21. Can you explain a disaster recovery strategy you've implemented on AWS?
+Q19. Can you explain a disaster recovery strategy you've implemented on AWS?
 Answer:
 I designed a disaster recovery plan for a critical application:
 1.	Backup and Restore: Automated EBS and RDS snapshots.
@@ -225,7 +205,7 @@ I designed a disaster recovery plan for a critical application:
 3.	S3 Cross-Region Replication: Ensured data availability.
 4.	Automated Recovery: Used CloudFormation templates for infrastructure recovery.
 ________________________________________
-Q22. How do you handle high availability in an EKS-based application?
+Q20. How do you handle high availability in an EKS-based application?
 Answer:
 1.	Multi-AZ Node Groups: Ensure worker nodes are spread across multiple availability zones.
 2.	Auto Scaling Groups: Automatically scale nodes based on demand.
