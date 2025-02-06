@@ -94,7 +94,7 @@ aws ec2 create-image --instance-id <instance-id> --name "MyBackupAMI"
 2.	Launch a new instance with the desired instance type:
 o	Attach the existing Elastic IP and Security Group to the new instance.
 3.	DNS Update:
-o	Update Route 53 DNS records to point to the new instance IP.
+o	Update Route 53 DNS records (A-record) to point to the new instance IP.
 4.	Validation:
 o	Test the application thoroughly after the instance switch.
 ________________________________________
@@ -124,6 +124,7 @@ o	Use the dynamic inventory file to target newly created resources.
   tasks:  
     - name: Install NGINX  
       apt: name=nginx state=present  
+
 3.	Automation Best Practices:
 o	Use Terraform remote state with AWS S3 and DynamoDB locking.
 o	Integrate Ansible playbooks in Jenkins for post-deployment configuration.
@@ -132,7 +133,7 @@ Scenario 6: AWS Lambda Timeout Issue (Real-Time Problem)
 Q: Your AWS Lambda function to stop EC2 instances times out after 3 seconds. How do you resolve this?
 A:
 1.	Increase Timeout:
-o	Modify the Lambda timeout setting to a higher value (e.g., 30 seconds).
+o	Modify the Lambda timeout setting to a higher value (e.g., 59 seconds).
 2.	Use Asynchronous Invocation:
 o	Trigger the function asynchronously to avoid synchronous timeout limitations.
 3.	Optimize Logic:
@@ -203,12 +204,8 @@ Q: Terraform operations fail with a "state file locked" error. How do you resolv
 A:
 1.	Check Lock in DynamoDB:
 o	If using remote state with DynamoDB, inspect the lock table.
-bash
-CopyEdit
 aws dynamodb scan --table-name terraform-lock-table  
 2.	Manually Remove Lock:
-bash
-CopyEdit
 aws dynamodb delete-item --table-name terraform-lock-table --key '{"LockID": {"S": "lock-id"}}'  
 3.	Best Practice:
 o	Enable DynamoDB state locking and avoid running concurrent Terraform operations.
@@ -223,8 +220,6 @@ o	Ensure the security group allows inbound traffic to the controller on port 500
 3.	Node Configuration:
 o	Verify that the agent is configured correctly with the Jenkins controller's IP address.
 4.	Restart Agent:
-bash
-CopyEdit
 java -jar agent.jar -jnlpUrl <jenkins-url>  
 ________________________________________
 Scenario 13: AWS Lambda Cold Start Optimization
@@ -243,8 +238,6 @@ Scenario 14: Kubernetes Ingress Not Routing Traffic Properly
 Q: Traffic isn't being routed to your Kubernetes services via Ingress. How do you resolve this?
 A:
 1.	Check Ingress Configuration:
-bash
-CopyEdit
 kubectl describe ingress <ingress-name>  
 2.	Verify Ingress Controller:
 o	Ensure the Ingress controller is deployed and running.
@@ -257,201 +250,10 @@ Scenario 15: Real-Time CI/CD GitOps Failure
 Q: GitOps deployment with Argo CD fails after a code push. How do you troubleshoot it?
 A:
 1.	Check Application Status:
-bash
-CopyEdit
 argocd app get <app-name>  
 2.	Inspect Sync Logs:
-bash
-CopyEdit
 argocd app logs <app-name>  
 3.	Resolve Git Merge Conflicts:
 o	Ensure the Git repository has no merge conflicts.
 4.	Best Practice:
 o	Use automated validation scripts before merging code into the main branch.
-
-Scenario 1: Website Hosted on EC2 is Unresponsive
-Q: How do you troubleshoot an unresponsive website hosted on EC2?
-A:
-1.	Check EC2 Instance Status:
-o	Ensure the instance state is "Running."
-o	Verify the instance status checks have passed.
-2.	Review Security Group Rules:
-o	Ensure inbound rules allow HTTP (port 80) or HTTPS (port 443) traffic.
-3.	Check System Logs:
-bash
-CopyEdit
-sudo tail -n 50 /var/log/messages  
-sudo tail -n 50 /var/log/httpd/error_log  
-4.	Verify Web Server Service:
-bash
-CopyEdit
-sudo systemctl status httpd  
-sudo systemctl restart httpd  
-________________________________________
-Scenario 2: Changing EC2 Instance Type Without Downtime
-Q: How do you change the instance type of a running EC2 instance without downtime?
-A:
-1.	Create a Snapshot of the Root Volume:
-o	Go to the AWS Console, select the instance, and create a snapshot.
-2.	Generate an AMI:
-o	Create an AMI from the snapshot.
-3.	Launch a New Instance:
-o	Select the desired instance type and launch a new instance using the AMI.
-4.	Update DNS Records:
-o	Point your DNS records (e.g., Route 53) to the new instance.
-5.	Terminate the Old Instance:
-o	Ensure everything is stable before terminating the old instance.
-________________________________________
-Scenario 3: Migrating RDS to a Multi-AZ Configuration
-Q: How do you migrate an RDS instance to Multi-AZ without downtime?
-A:
-1.	Enable Multi-AZ Deployment:
-o	Modify the RDS instance and select "Multi-AZ deployment."
-2.	Monitor the Migration Process:
-o	Use CloudWatch to monitor replication status.
-3.	Test Failover:
-o	Force a failover to ensure high availability.
-4.	Best Practice:
-o	Schedule the migration during low-traffic periods.
-________________________________________
-Scenario 4: EBS Volume Performance Degradation
-Q: How do you troubleshoot and improve EBS performance?
-A:
-1.	Check CloudWatch Metrics:
-o	Look for high VolumeQueueLength or low VolumeThroughput.
-2.	Upgrade Volume Type:
-o	Move from gp2 to gp3 for higher throughput.
-3.	Enable IOPS Provisioning:
-o	For critical workloads, enable provisioned IOPS.
-4.	Best Practice:
-o	Spread workloads across multiple volumes.
-________________________________________
-Scenario 5: Auto Scaling for Zero Downtime Deployments
-Q: How do you achieve zero downtime during Auto Scaling deployments?
-A:
-1.	Pre-Warm Load Balancer:
-o	Manually increase load balancer capacity.
-2.	Rolling Updates:
-o	Use rolling deployments to gradually update instances.
-3.	Health Checks:
-o	Configure health checks to ensure only healthy instances receive traffic.
-4.	Blue-Green Deployments:
-o	Use blue-green deployments for seamless transitions.
-________________________________________
-Scenario 6: AWS Lambda Timeout Issue
-Q: How do you troubleshoot a Lambda function timeout issue?
-A:
-1.	Increase Timeout Limit:
-o	Set a higher timeout value in the Lambda function configuration.
-2.	Optimize Code Execution:
-o	Reduce cold start times by reducing the package size and initializing global variables efficiently.
-3.	Use Asynchronous Invocations:
-o	Enable asynchronous processing for non-critical tasks.
-________________________________________
-Scenario 7: Troubleshooting Slow Application Performance on AWS EC2
-Q: An application hosted on EC2 is experiencing slow response times. How would you troubleshoot and resolve this issue?
-A:
-1.	Check EC2 Metrics:
-o	Use CloudWatch to monitor CPU utilization, memory, and disk I/O.
-2.	Analyze System Logs:
-sudo cat /var/log/messages  
-sudo cat /var/log/nginx/error.log  
-3.	Check Network Performance:
-o	Verify Security Group rules and Network ACLs.
-4.	Optimize Application Performance:
-o	Scale vertically by increasing instance size or enabling enhanced networking.
-o	Scale horizontally by setting up an Auto Scaling Group (ASG).
-o	Use caching (Redis or Memcached).
-o	Enable gzip compression in Nginx/Apache.
-________________________________________
-Scenario 8: RDS Database Connection Error
-Q: Your application cannot connect to an RDS instance after deployment. How do you resolve this?
-A:
-1.	Check RDS Endpoint and Port:
-nslookup <rds-endpoint>  
-telnet <rds-endpoint> 3306  
-2.	Verify Security Group:
-o	Ensure the security group allows inbound traffic from the application server's security group.
-3.	Database Configuration:
-o	Check the database username, password, and connection string.
-4.	IAM Role Configuration (if using IAM authentication):
-o	Attach the appropriate IAM role to the application server.
-________________________________________
-Scenario 9: EKS Cluster Node Failure
-Q: One or more worker nodes in your EKS cluster are in a "NotReady" state. How do you troubleshoot this?
-A:
-1.	Check Node Status:
-kubectl get nodes  
-2.	Inspect Node Events:
-kubectl describe node <node-name>  
-3.	SSH into the Node:
-o	Check kubelet logs and Docker service status.
-sudo journalctl -u kubelet  
-sudo systemctl status docker  
-4.	Possible Solutions:
-o	Restart the kubelet and Docker services.
-o	Verify that the node IAM role has the correct permissions.
-o	Check for insufficient CPU or memory.
-________________________________________
-Scenario 10: AWS Auto Scaling Not Triggering as Expected
-Q: Your Auto Scaling Group (ASG) isn't scaling even under high load. How do you troubleshoot and fix it?
-A:
-1.	Check CloudWatch Alarms:
-o	Ensure alarms are configured correctly to trigger scaling actions.
-2.	Verify Scaling Policies:
-o	Ensure policies are associated with the correct ASG.
-3.	Health Check Configuration:
-o	Ensure that the health check type is set correctly (EC2 or ELB).
-4.	Instance Lifecycle Hook Issue:
-o	Check for stuck lifecycle hooks that prevent scaling events.
-________________________________________
-Scenario 11: Terraform State File Locking Issue
-Q: Terraform operations fail with a "state file locked" error. How do you resolve this?
-A:
-1.	Check Lock in DynamoDB:
-aws dynamodb scan --table-name terraform-lock-table  
-2.	Manually Remove Lock:
-aws dynamodb delete-item --table-name terraform-lock-table --key '{"LockID": {"S": "lock-id"}}'  
-________________________________________
-Scenario 12: Jenkins Agent Connection Failure
-Q: Jenkins agents are unable to connect to the Jenkins controller. How do you troubleshoot this?
-A:
-1.	Check Agent Logs:
-o	Analyze agent logs for connection errors.
-2.	Verify Network Connectivity:
-o	Ensure the security group allows inbound traffic to the controller on port 50000.
-3.	Node Configuration:
-o	Verify that the agent is configured correctly with the Jenkins controller's IP address.
-________________________________________
-Scenario 13: AWS Lambda Cold Start Optimization
-Q: Your AWS Lambda function has a high cold start time. How do you optimize it?
-A:
-1.	Use Provisioned Concurrency:
-o	Pre-warm Lambda functions.
-2.	Optimize Package Size:
-o	Reduce the function package size to minimize initialization time.
-3.	Keep Warm Mechanism:
-o	Use CloudWatch Event rules to invoke the function periodically.
-________________________________________
-Scenario 14: Kubernetes Ingress Not Routing Traffic Properly
-Q: Traffic isn't being routed to your Kubernetes services via Ingress. How do you resolve this?
-A:
-1.	Check Ingress Configuration:
-kubectl describe ingress <ingress-name>  
-2.	Verify Ingress Controller:
-o	Ensure the Ingress controller is deployed and running.
-3.	DNS Configuration:
-o	Verify that the domain resolves to the correct load balancer.
-4.	TLS Configuration:
-o	Check for proper certificate configuration.
-________________________________________
-Scenario 15: Real-Time CI/CD GitOps Failure
-Q: GitOps deployment with Argo CD fails after a code push. How do you troubleshoot it?
-A:
-1.	Check Application Status:
-argocd app get <app-name>  
-2.	Inspect Sync Logs:
-argocd app logs <app-name>  
-3.	Resolve Git Merge Conflicts:
-o	Ensure the Git repository has no merge conflicts.
-
