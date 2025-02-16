@@ -1,0 +1,96 @@
+Beginners to the Expert Level
+PromQL and Prometheus Metrics - Q&A with Scenarios
+Introduction to Prometheus and PromQL
+Q1: What is Prometheus, and how does it collect data?
+A1: Prometheus is an open-source monitoring and alerting system designed for reliability and scalability. It collects metrics by scraping HTTP endpoints that expose time-series data, typically every few seconds.
+Q2: What is PromQL?
+A2: PromQL (Prometheus Query Language) is a powerful language used to query and analyze time-series data stored in Prometheus.
+Q3: What are the different types of metrics in Prometheus?
+A3: Prometheus supports four primary metric types:
+•	Counter: A monotonically increasing value (e.g., total HTTP requests).
+•	Gauge: A value that can go up and down (e.g., CPU usage).
+•	Histogram: A set of buckets for measuring distributions (e.g., request durations).
+•	Summary: Similar to a histogram but provides quantiles (e.g., p95 response time).
+________________________________________
+Working with PromQL Queries
+Q4: What is an instant vector and a range vector in PromQL?
+A4:
+•	Instant Vector: A single value for each time series at the most recent scrape time.
+•	Range Vector: A set of values over a specific time range for each time series.
+Example:
+•	http_requests_total → Instant Vector (current value).
+•	http_requests_total[5m] → Range Vector (last 5 minutes of data).
+Q5: How do you filter metrics using labels in PromQL?
+You can use label filters to refine results.
+•	http_requests_total{method="GET"} → Fetches only GET requests.
+•	http_requests_total{path="/metrics", method="POST"} → Fetches only POST requests on /metrics.
+________________________________________
+Scenario-Based Q&A
+Scenario 1: Counting Total Requests
+Q6: How can you count the total number of HTTP requests received?
+sum(http_requests_total)
+This sums up all HTTP requests across different labels.
+Scenario 2: Tracking CPU Usage
+Q7: How do you monitor CPU usage over time?
+
+rate(node_cpu_seconds_total[1m])
+This calculates the per-second CPU usage rate over a 1-minute window.
+Scenario 3: Measuring Request Latency
+Q8: How do you measure the average duration of HTTP requests?
+
+rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])
+This computes the average request duration over the last 5 minutes.
+Scenario 4: Finding Error Rate
+Q9: How do you calculate the error rate in Prometheus?
+
+sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+This finds the percentage of 5xx errors over all requests in the last 5 minutes.
+Scenario 5: Detecting High Memory Usage
+Q10: How can you detect when memory usage is too high?
+node_memory_Active_bytes / node_memory_MemTotal_bytes * 100
+This calculates the percentage of active memory used.
+Scenario 6: Filtering Metrics with Regex
+Q11: How do you filter requests with paths starting with /items?
+
+http_requests_total{path=~"/items.*"}
+This matches any path that starts with /items.
+Scenario 7: Excluding Certain Metrics with Negative Regex
+Q12: How do you exclude paths that start with /items?
+
+http_requests_total{path!~"/items.*"}
+This removes all metrics where the path starts with /items.
+Scenario 8: Querying for Slow Requests
+Q13: How do you find requests that took longer than 1 second?
+
+http_request_duration_seconds_bucket{le="1"}
+This finds requests that took 1 second or less.
+Scenario 9: Checking Active Connections
+Q14: How can you monitor the number of active HTTP connections?
+
+sum(http_connections_active)
+This shows the total number of active connections.
+Scenario 10: Monitoring Traffic by Status Code
+Q15: How do you find the number of 4xx responses?
+sum(rate(http_requests_total{status=~"4.."}[5m]))
+This counts all 4xx status responses in the last 5 minutes.
+________________________________________
+Advanced PromQL Concepts
+Q16: What is the difference between rate() and irate()?
+
+•	rate(): Computes the per-second average over a time range.
+•	irate(): Computes the per-second rate using only the last two samples.
+Q17: How can you visualize rolling averages?
+Use avg_over_time():
+avg_over_time(http_request_duration_seconds[5m])
+This calculates the 5-minute rolling average request duration.
+Q18: What is the purpose of increase() in PromQL?
+increase() calculates the total increase of a counter over a time range.
+increase(http_requests_total[1h])
+This finds the number of requests received in the last hour.
+Q19: How can you alert when CPU usage exceeds 80%?
+(node_cpu_seconds_total / node_cpu_seconds_total) * 100 > 80
+This can be used to trigger an alert in an Alertmanager rule.
+________________________________________
+Conclusion
+This Q&A provides a solid foundation for working with PromQL, querying Prometheus metrics, and applying real-world monitoring scenarios.
+
