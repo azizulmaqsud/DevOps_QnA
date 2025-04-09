@@ -1,0 +1,340 @@
+Docker Prime Issues for the DevOps 
+Docker Troubleshooting Steps Explained
+with Total 30 Scenarios 
+Questionnaire 
+Scenario 1: Docker Daemon Not Running
+Scenario 2: Docker Version Mismatch
+Scenario 3: Unable to Pull Docker Image
+Scenario 4: Docker Image Takes Too Much Disk Space
+Scenario 5: Container Fails to Start
+Scenario 6: Container Running but Application Not Accessible
+Scenario 7: Containers Cannot Communicate
+Scenario 8: Network Conflict
+Scenario 9: Data Loss After Container Removal
+Scenario 10: Volume Not Attached  
+Scenario 11: Docker Compose File Not Working
+Scenario 12: Containers Not Starting in Docker Compose
+Scenario 13: Swarm Node Not Joining
+Scenario 14: Service Not Scaling
+Scenario 15: Docker Build Fails Due to Missing Dependencies
+Scenario 16: Docker Build Cache Issues 
+Scenario 17: Container Running Out of Memory 
+Scenario 18: Container Using Too Much CPU  
+Scenario 19: Containers Cannot Resolve DNS  
+Scenario 20: Port Already in Use 
+Scenario 21: Docker Compose Services Not Communicating 
+Scenario 22: Docker Compose Environment Variables Not Working  
+Scenario 23: Swarm Service Not Distributing Across Nodes 
+Scenario 24: Swarm Service Rolling Update Fails  
+Scenario 25: Container Running as Root 
+Scenario 26: Docker Hub Rate Limit Exceeded 
+Scenario 27: Container Logs Too Large 
+Scenario 28: Debugging a Running Container 
+Scenario 29: Unable to Push to Docker Hub 
+Scenario 30: Private Registry Authentication Issues
+
+In Detail:
+________________________________________
+1. Basic Docker Commands
+Scenario 1: Docker Daemon Not Running
+•	Issue: You run sudo docker ps and get an error: Cannot connect to the Docker daemon.
+•	Troubleshooting Steps:
+1.	Check if the Docker service is running:
+sudo systemctl status docker
+2.	If not running, start the Docker service:
+sudo systemctl start docker
+3.	Add your user to the docker group to avoid sudo:
+sudo usermod -aG docker $USER
+Then, log out and log back in.
+________________________________________
+Scenario 2: Docker Version Mismatch
+•	Issue: You are using a Docker command that is not supported in your installed version.
+•	Troubleshooting Steps:
+1.	Check the Docker version:
+docker --version
+2.	Update Docker to the latest version:
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+________________________________________
+2. Docker Image Commands
+Scenario 3: Unable to Pull Docker Image
+•	Issue: You run docker pull ubuntu and get an error: Error response from daemon: pull access denied.
+•	Troubleshooting Steps:
+1.	Ensure you are logged into Docker Hub:
+sudo docker login
+2.	Check if the image name is correct (e.g., ubuntu instead of ubunto).
+3.	If using a private image, verify you have access permissions.
+________________________________________
+Scenario 4: Docker Image Takes Too Much Disk Space
+•	Issue: Your system is running out of disk space due to unused Docker images.
+•	Troubleshooting Steps:
+1.	List all Docker images:
+sudo docker images
+2.	Remove unused images:
+sudo  docker image prune -a
+3.	Remove specific images:
+sudo docker rmi <image_id>
+________________________________________
+3. Docker Container Commands
+Scenario 5: Container Fails to Start
+•	Issue: You run docker run my-flask-app and the container exits immediately.
+•	Troubleshooting Steps:
+1.	Check the container logs:
+sudo docker logs <container_id>
+2.	Run the container in interactive mode to debug:
+sudo docker run -it my-flask-app /bin/sh
+3.	Verify the Dockerfile CMD or ENTRYPOINT is correct.
+________________________________________
+Scenario 6: Container Running but Application Not Accessible
+•	Issue: You run docker run -d -p 5000:5000 my-flask-app, but the app is not accessible on localhost:5000.
+•	Troubleshooting Steps:
+1.	Check if the container is running:
+sudo docker ps
+2.	Verify the port mapping:
+sudo docker inspect <container_id> | grep HostPort
+3.	Ensure the application inside the container is listening on the correct port (e.g., 0.0.0.0:5000).
+________________________________________
+4. Docker Network Commands
+Scenario 7: Containers Cannot Communicate
+•	Issue: Two containers cannot communicate with each other.
+•	Troubleshooting Steps:
+1.	Create a custom Docker network:
+sudo docker network create my-network
+2.	Attach both containers to the same network:
+docker run --network my-network --name container1 my-flask-app
+docker run --network my-network --name container2 redis
+3.	Use the container names to communicate (e.g., 
+ping container1 from container2).
+________________________________________
+Scenario 8: Network Conflict
+•	Issue: You get an error: network with name my-network already exists.
+•	Troubleshooting Steps:
+1.	List all networks:
+sudo docker network ls
+2.	Remove the conflicting network:
+sudo docker network rm my-network
+3.	Recreate the network.
+________________________________________
+5. Docker Volume Commands
+Scenario 9: Data Loss After Container Removal
+•	Issue: You removed a container, and the data inside it was lost.
+•	Troubleshooting Steps:
+1.	Use Docker volumes to persist data:
+docker volume create my-volume
+docker run -v my-volume:/data my-flask-app
+2.	Verify the volume is attached:
+docker inspect <container_id> | grep Mounts
+________________________________________
+Scenario 10: Volume Not Attached
+•	Issue: You created a volume, but the container is not using it.
+•	Troubleshooting Steps:
+1.	Verify the volume exists:
+docker volume ls
+2.	Re-run the container with the correct volume mapping:
+docker run -v my-volume:/data my-flask-app
+________________________________________
+6. Docker Compose Commands
+Scenario 11: Docker Compose File Not Working
+•	Issue: You run docker-compose up and get an error: Invalid Compose file.
+•	Troubleshooting Steps:
+1.	Validate the docker-compose.yml file:
+docker-compose config
+2.	Check for syntax errors (e.g., indentation, missing colons).
+3.	Ensure the correct version is specified at the top of the file:
+version: '3'
+________________________________________
+Scenario 12: Containers Not Starting in Docker Compose
+•	Issue: You run docker-compose up, but the containers fail to start.
+•	Troubleshooting Steps:
+1.	Check the logs:
+docker-compose logs
+2.	Start the containers in detached mode and debug:
+docker-compose up -d
+docker-compose exec <service_name> /bin/sh
+________________________________________
+7. Docker Swarm Commands
+Scenario 13: Swarm Node Not Joining
+•	Issue: You run docker swarm join but the worker node does not join the cluster.
+•	Troubleshooting Steps:
+1.	Verify the token is correct:
+docker swarm join-token worker
+2.	Ensure the worker node can reach the manager node over the network.
+3.	Check firewall rules to allow Docker Swarm ports (e.g., 2377, 7946, 4789).
+________________________________________
+Scenario 14: Service Not Scaling
+•	Issue: You run docker service scale my-service=3, but only one replica is running.
+•	Troubleshooting Steps:
+1.	Check the service status:
+docker service ps my-service
+2.	Ensure there are enough resources (CPU, memory) on the worker nodes.
+3.	Verify the Docker Swarm is initialized:
+docker node ls
+
+8. Docker Build Issues
+Scenario 15: Docker Build Fails Due to Missing Dependencies
+•	Issue: You run docker build -t my-app . and get an error: Unable to locate package <package_name>.
+•	Troubleshooting Steps:
+1.	Update the base image in the Dockerfile:
+FROM ubuntu:latest
+2.	Ensure the package repository is updated before installing dependencies:
+RUN apt-get update && apt-get install -y <package_name>
+3.	Verify the package name is correct.
+________________________________________
+
+
+
+Real-time Interview Crackers!  Part # 21:2
+Scenario 16: Docker Build Cache Issues
+•	Issue: You made changes to your application code, but Docker is using the cached layers and not reflecting the changes.
+•	Troubleshooting Steps:
+1.	Force Docker to rebuild from scratch:
+docker build --no-cache -t my-app .
+2.	Use multi-stage builds to optimize caching:
+FROM node:14 as build
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+________________________________________
+9. Docker Container Resource (CPU + Memory) Limits
+Scenario 17: Container Running Out of Memory (OOM)
+•	Issue: Your container crashes with an error: Out of memory.
+•	Troubleshooting Steps:
+1.	Limit the container’s memory usage:
+docker run -m 512m my-app
+2.	Monitor memory usage:
+docker stats <container_id>
+3.	Optimize the application to use less memory.
+________________________________________
+Scenario 18: Container Using Too Much CPU
+•	Issue: Your container is consuming 100% CPU and slowing down the host machine.
+•	Troubleshooting Steps:
+1.	Limit the container’s CPU usage:
+docker run --cpus="1.5" my-app
+2.	Use CPU quotas:
+docker run --cpu-quota=50000 my-app
+3.	Optimize the application code to reduce CPU usage.
+________________________________________
+10. Docker Networking Advanced Scenarios
+Scenario 19: Containers Cannot Resolve DNS
+•	Issue: Containers cannot resolve domain names (e.g., ping google.com fails).
+•	Troubleshooting Steps:
+1.	Check the DNS configuration:
+docker run --dns=8.8.8.8 my-app
+2.	Verify the host machine’s DNS settings.
+3.	Use a custom resolv.conf file:
+docker run --dns-search=mydomain.com my-app
+________________________________________
+Scenario 20: Port Already in Use
+•	Issue: You get an error: Bind for 0.0.0.0:80 failed: port is already allocated.
+•	Troubleshooting Steps:
+1.	Find the process using the port:
+sudo netstat -tuln | grep :80
+2.	Stop the conflicting process or use a different port:
+docker run -p 8080:80 my-app
+________________________________________
+11. Docker Compose Advanced Scenarios
+Scenario 21: Docker Compose Services Not Communicating
+•	Issue: Services defined in docker-compose.yml cannot communicate with each other.
+•	Troubleshooting Steps:
+1.	Ensure all services are on the same network:
+services:
+  web:
+    networks:
+      - my-network
+  db:
+    networks:
+      - my-network
+networks:
+  my-network:
+2.	Use service names for communication (e.g., db:3306).
+________________________________________
+Scenario 22: Docker Compose Environment Variables Not Working
+•	Issue: Environment variables defined in docker-compose.yml are not being picked up.
+•	Troubleshooting Steps:
+1.	Verify the syntax in docker-compose.yml:
+environment:
+  - MY_VAR=my_value
+2.	Use an .env file for environment variables:
+env_file:
+  - .env
+________________________________________
+12. Docker Swarm Advanced Scenarios
+Scenario 23: Swarm Service Not Distributing Across Nodes
+•	Issue: All replicas of a service are running on a single node.
+•	Troubleshooting Steps:
+1.	Check the service placement constraints:
+docker service create --constraint node.role==worker my-service
+2.	Ensure all nodes are active and healthy:
+docker node ls
+________________________________________
+Scenario 24: Swarm Service Rolling Update Fails
+•	Issue: Rolling update of a service fails, and the service becomes unavailable.
+•	Troubleshooting Steps:
+1.	Use --update-delay and --update-parallelism to control the update process:
+docker service update --update-delay 10s --update-parallelism 1 my-service
+2.	Roll back to the previous version:
+docker service rollback my-service
+________________________________________
+13. Docker Security Issues
+Scenario 25: Container Running as Root
+•	Issue: Your container is running as the root user, which is a security risk.
+•	Troubleshooting Steps:
+1.	Run the container as a non-root user:
+USER myuser
+2.	Use --user flag to specify a user:
+docker run --user 1000:1000 my-app
+________________________________________
+Scenario 26: Docker Hub Rate Limit Exceeded
+•	Issue: You get an error: toomanyrequests: You have reached your pull rate limit.
+•	Troubleshooting Steps:
+1.	Log in to Docker Hub:
+sudo docker login
+2.	Use a different registry or cache images locally.
+________________________________________
+14. Docker Logs and Debugging
+Scenario 27: Container Logs Too Large
+•	Issue: Container logs are consuming too much disk space.
+•	Troubleshooting Steps:
+1.	Limit log size and rotation:
+docker run --log-opt max-size=10m --log-opt max-file=3 my-app
+2.	Clear logs for a specific container:
+truncate -s 0 $(docker inspect --format='{{.LogPath}}' <container_id>)
+________________________________________
+Scenario 28: Debugging a Running Container
+•	Issue: You need to debug a running container without stopping it.
+•	Troubleshooting Steps:
+1.	Attach to the container:
+docker attach <container_id>
+2.	Use docker exec to run debugging tools:
+docker exec -it <container_id> /bin/sh
+________________________________________
+15. Docker Registry Issues
+Scenario 29: Unable to Push to Docker Hub
+•	Issue: You get an error: denied: requested access to the resource is denied.
+•	Troubleshooting Steps:
+1.	Verify you are logged in:
+sudo docker login
+2.	Ensure the image is tagged correctly:
+docker tag my-app my-dockerhub-username/my-app
+docker push my-dockerhub-username/my-app
+________________________________________
+Scenario 30: Private Registry Authentication Issues
+•	Issue: You cannot pull/push images from a private registry.
+•	Troubleshooting Steps:
+1.	Log in to the private registry:
+sudo docker login my-private-registry.com
+2.	Verify the registry URL and credentials.
+
+Compiled by: Azizul Maqsud
+Please reach me out @ LinkedIn + YouTube + Medium + Hashnode + GitHub
+https://www.youtube.com/channel/UCNwP7KEElaJ7cdDTLP-KbBg
+https://www.linkedin.com/in/azizul-maqsud/
+https://azizulmaqsud-1684501031000.hashnode.dev/
+https://medium.com/@azizulmaqsud
+https://github.com/azizulmaqsud
+
